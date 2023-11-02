@@ -7,7 +7,7 @@ from pathlib import Path
 
 def list_pdfs_dir(path: Path):
     """
-    Lists all the pdfs in a given path, both in the root and in subfolders.
+    Lists all the pdfs in a given path.
     
     Parameters
     ----------
@@ -29,7 +29,7 @@ def list_pdfs_dir(path: Path):
 if __name__ in "__main__":
     path = Path(__file__).parent
 
-    pdfs_path = path / "pdfs" / "page0064.pdf"
+    pdfs_path = path / "pdfs" 
     out_path = path / "extracted_txt"
 
     # get all pdfs in the folder
@@ -48,5 +48,5 @@ if __name__ in "__main__":
             
             txt_all = " ".join([txt_all, txt])
 
-        with open(out_path / f"{pdf.stem}.txt", "w") as text_file:
+        with open(out_path / f"{pdf.stem}.txt", "w", encoding="latin1") as text_file:
                 text_file.write(txt_all)
