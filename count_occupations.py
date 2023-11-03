@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import pandas as pd
 import re
@@ -63,18 +62,28 @@ def extract_streets(splitted: list):
 
 
 if __name__ in "__main__":
+    
     path = Path(__file__).parent
 
     txts_path = path / "extracted_text" 
 
     occupation_list = pd.read_csv( path / "occupation_list.csv")
 
-    # create master data frame
-    data = pd.DataFrame( {'year': None, 'street': None, 'occupations': None, 'count': None} )
+    # DELETE OR EDIT ONCE TRUE OCCUPATION_LIST IS AVAILABLE
+    occupation_list = list( occupation_list['Navn'] )
 
+    # create master data frame
+    data = pd.DataFrame(columns = ['year', 'street', 'occupations', 'count'])
+    
     txts_in = list_txts_dir(txts_path)
 
+    n_txts = len(txts_in)
+    txt_counter = 0
+
     for txt_in in txts_in:
+
+        txt_counter += 1
+        print(f"[INFO]: Processing text {txt_counter} of {n_txts}")
 
         with open(txt_in, "r", encoding='latin-1') as file:
             txt = file.read()
@@ -83,9 +92,13 @@ if __name__ in "__main__":
 
         dictionary = extract_streets(splitted)
 
+        # add corresponding text to each street in dictionary
         for i, idx in enumerate(dictionary['index']):
 
-            next_street_index = dictionary['index'][i+1]
+            if i == len(dictionary['index'])-1:
+                next_street_index = None
+            else:
+                next_street_index = dictionary['index'][i+1]
             text_chunk = splitted[idx:next_street_index]
             dictionary['text'].append(text_chunk)
 
@@ -99,17 +112,17 @@ if __name__ in "__main__":
 
             # organize in df
             df = pd.DataFrame({
-                "year": [os.path.splitext(txt_in)[0]] * len(occupations_count),
-                "street": [data["street"][i]] * len(occupations_count),
+                "year": [Path(txt_in).stem] * len(occupations_count),
+                "street": [dictionary['street'][i]] * len(occupations_count),
                 "occupations": [item[0] for item in occupations_count.items()],
                 "count":       [item[1] for item in occupations_count.items()]
                 })
 
             data = pd.concat([data, df], ignore_index=True, axis=0)
 
-        # create ndjson
-        data_json = data.to_json(orient='records', lines=True)
+    # create ndjson
+    data_json = data.to_json(orient='records', lines=True)
 
-        out_path = path / "out" / "street_occupations.ndjson"
-        with open(out_path, "w", encoding="latin-1") as file:
-            file.write(data_json)
+    out_path = path / "out" / "street_occupations.ndjson"
+    with open(out_path, "w", encoding="latin-1") as file:
+        file.write(data_json)
