@@ -1,7 +1,4 @@
 #!/bin/bash
-sudo apt-get install python-poppler
-sudo apt install tesseract-ocr -y
-sudo apt-get install tesseract-ocr-dan
 
 # Get the directory of the Bash script
 scriptDir=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
@@ -11,6 +8,14 @@ python -m venv "$scriptDir/env"
 
 # Activate the virtual environment
 source "$scriptDir/env/bin/activate"
+
+# Install programs
+sudo apt-get install -y libpoppler-cpp-dev
+sudo apt-get install python-poppler
+apt-get install poppler-utils
+sudo apt install tesseract-ocr -y
+sudo apt-get install tesseract-ocr-dan
+
 
 # Install requirements from the same directory as the script
 python -m pip install -r "$scriptDir/requirements.txt"
