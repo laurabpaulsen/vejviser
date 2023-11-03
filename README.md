@@ -25,6 +25,7 @@ The repository is structured as follows:
 ├── extracted_text              # not included in repository
 ├── misc                        # not included in repository
 ├── pdfs                        # not included in repository
+├── out                         # not included in repository
 ├── create_occupation_list.py   creates a list of occupations from the extracted text
 ├── extract_txt_ocr.py          extracts text from images using OCR
 ├── README.md
