@@ -70,7 +70,7 @@ if __name__ in "__main__":
     occupation_list = pd.read_csv( path / "occupation_list.csv")
 
     # DELETE OR EDIT ONCE TRUE OCCUPATION_LIST IS AVAILABLE
-    occupation_list = list( occupation_list['Navn'] )
+    occupation_list = list(occupation_list['occupation'] )
 
     # create master data frame
     data = pd.DataFrame(columns = ['year', 'street', 'occupations', 'count'])
@@ -123,6 +123,10 @@ if __name__ in "__main__":
     # create ndjson
     data_json = data.to_json(orient='records', lines=True)
 
-    out_path = path / "out" / "street_occupations.ndjson"
-    with open(out_path, "w", encoding="latin-1") as file:
+    out_path = path / "out" 
+    
+    if not out_path.exists():
+        out_path.mkdir()
+    
+    with open(out_path / "street_occupations.ndjson", "w", encoding="latin-1") as file:
         file.write(data_json)
