@@ -17,7 +17,7 @@ def load_concat_txt(path):
     txt_files = [file for file in path.glob("*.txt")]
 
     # load in all txt files
-    txt_files = [open(txt_file, "r", encoding="latin1").read() for txt_file in txt_files]
+    txt_files = [open(txt_file, "r", encoding="UFT-8").read() for txt_file in txt_files]
 
     # concatenate all txt files
     txt_files = " ".join(txt_files)
