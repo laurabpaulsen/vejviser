@@ -30,7 +30,10 @@ if __name__ in "__main__":
     path = Path(__file__).parent
 
     pdfs_path = path / "pdfs" 
-    out_path = path / "extracted_txt"
+    out_path = path / "extracted_text"
+
+    if not out_path.exists():
+        out_path.mkdir()
 
     # get all pdfs in the folder
     pdfs = list_pdfs_dir(pdfs_path)
@@ -48,5 +51,5 @@ if __name__ in "__main__":
             
             txt_all = " ".join([txt_all, txt])
 
-        with open(out_path / f"{pdf.stem}.txt", "w", encoding="latin1") as text_file:
+        with open(out_path / f"{pdf.stem}.txt", "w", encoding="UTF-8") as text_file:
                 text_file.write(txt_all)
