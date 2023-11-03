@@ -161,4 +161,5 @@ cython_debug/
 *.csv
 
 pdfs/*
-extracted_txt/*
+extracted_text/*
+out/*
