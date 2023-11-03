@@ -17,7 +17,7 @@ def load_concat_txt(path):
     txt_files = [file for file in path.glob("*.txt")]
 
     # load in all txt files
-    txt_files = [open(txt_file, "r", encoding="UFT-8").read() for txt_file in txt_files]
+    txt_files = [open(txt_file, "r", encoding="UTF-8").read() for txt_file in txt_files]
 
     # concatenate all txt files
     txt_files = " ".join(txt_files)
@@ -86,7 +86,7 @@ if __name__ in "__main__":
     path = Path(__file__).parent
 
     # load in the extracted text files from vejvisere
-    txt_path = path / "extracted_txt"
+    txt_path = path / "extracted_text"
 
     txts = load_concat_txt(txt_path)
 
