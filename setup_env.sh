@@ -10,9 +10,9 @@ python -m venv "$scriptDir/env"
 source "$scriptDir/env/bin/activate"
 
 # Install programs
-sudo apt-get install -y libpoppler-cpp-dev
 sudo apt-get install python-poppler
-apt-get install poppler-utils
+sudo apt-get install poppler-utils
+sudo apt-get install -y libpoppler-cpp-dev
 sudo apt install tesseract-ocr -y
 sudo apt-get install tesseract-ocr-dan
 
