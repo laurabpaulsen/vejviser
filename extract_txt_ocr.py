@@ -4,7 +4,7 @@ from pdf2image import convert_from_path
 import pytesseract
 from pathlib import Path
 from tqdm import tqdm
-import ndjson
+import json
 
 def list_pdfs_dir(path: Path):
     """
@@ -37,8 +37,8 @@ if __name__ in "__main__":
         out_path.mkdir()
 
     # load the file info
-    with open(path / 'file_info.ndjson', 'r') as f:
-        file_info = ndjson.load(f)
+    with open(path / 'file_info.txt', 'r') as f:
+        file_info = json.load(f)
 
     # get all pdfs in the folder
     pdfs = list_pdfs_dir(pdfs_path)

@@ -4,7 +4,7 @@ This script creates a dictionary of file information for the files in the pdfs f
 It holds the start and stop page numbers for each file, as well as the file name.
 """
 from pathlib import Path
-import ndjson
+import json
 
 if __name__ in "__main__":
     path = Path(__file__).parent
@@ -18,7 +18,7 @@ if __name__ in "__main__":
     }
 
     # save the dictionary to a file
-    with open(path / 'file_info.ndjson', 'w') as f:
-        ndjson.dump(file_info, f)
+    with open(path / 'file_info.txt', 'w') as f:
+        json.dump(file_info, f)
 
 
