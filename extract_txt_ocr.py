@@ -3,7 +3,7 @@ from PIL import Image
 from pdf2image import convert_from_path
 import pytesseract
 from pathlib import Path
-
+from tqdm import tqdm
 
 def list_pdfs_dir(path: Path):
     """
@@ -38,14 +38,14 @@ if __name__ in "__main__":
     # get all pdfs in the folder
     pdfs = list_pdfs_dir(pdfs_path)
 
-    for pdf in pdfs:
+    for pdf in tqdm(pdfs, desc = "Extracting text from pdf"):
         
         # convert pdf to image
         doc = convert_from_path(pdf)
 
         txt_all = ""
 
-        for page_number, page_data in enumerate(doc):
+        for page_number, page_data in tqdm(enumerate(doc)):
             page_data = np.asarray(page_data)
             txt = pytesseract.image_to_string(Image.fromarray(page_data), lang='dan')
             
