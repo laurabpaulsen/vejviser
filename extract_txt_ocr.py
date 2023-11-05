@@ -4,6 +4,7 @@ from pdf2image import convert_from_path
 import pytesseract
 from pathlib import Path
 from tqdm import tqdm
+import ndjson
 
 def list_pdfs_dir(path: Path):
     """
@@ -35,13 +36,21 @@ if __name__ in "__main__":
     if not out_path.exists():
         out_path.mkdir()
 
+    # load the file info
+    with open(path / 'file_info.ndjson', 'r') as f:
+        file_info = ndjson.load(f)
+
     # get all pdfs in the folder
     pdfs = list_pdfs_dir(pdfs_path)
 
     for pdf in tqdm(pdfs, desc = "Extracting text from pdf"):
+
+        # get the start and stop page numbers for the file
+        start_page = file_info[pdf.name][0]
+        stop_page = file_info[pdf.name][1]
         
         # convert pdf to image
-        doc = convert_from_path(pdf)
+        doc = convert_from_path(pdf, first_page=start_page, last_page=stop_page)
 
         txt_all = ""
 
