@@ -39,7 +39,6 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 
 * Some occupations might be captured by different spellings. To merge these we would need to make some kind of mapping. 
 
-* The older fonts are causing some issues making it difficult to accurately extract the text from the scanned books
 
 * The way we determine when we have reached a new street seems to work well for several years. However, this should be thoroughly tested. 
 
