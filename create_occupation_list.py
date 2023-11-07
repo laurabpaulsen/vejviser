@@ -2,34 +2,33 @@ from pathlib import Path
 import re
 import pandas as pd
 
-def load_concat_txt(path):
+def load_txt(path):
     """
-    Loads and concatenates all txt files in a directory
-
+    Loads txts files from a directory and adds them to a list. Furthermore a list with the year of the txt files is created.
     Args:
         Path: path to directory
 
     Returns:
-        str: concatenated txt files
+        txt_files: list with txt files
+        years: list with years
     """
 
     # get all txt files in the directory
-    txt_files = [file for file in path.glob("*.txt")]
+    txt_paths = [file for file in path.glob("*.txt")]
+
+    # get the year of the txt files using regex looking for 4 digits
+    years = [re.findall(r"\d{4}", str(path))[0] for path in txt_paths]
 
     # load in all txt files
-    txt_files = [open(txt_file, "r", encoding="UTF-8").read() for txt_file in txt_files]
+    txt_files = [open(txt_path, "r", encoding="UTF-8").read() for txt_path in txt_paths]
 
-    # concatenate all txt files
-    txt_files = " ".join(txt_files)
-
-    return txt_files
+    return txt_files, years
 
 
-def extract_potential_occupations(txt):
+
+def extract_potential_occupations(txt:str, year:int):
     """
     Extracts the potential occupations.
-    
-    Notes: Occupations preceeds the phone number in a format XX XX XX XX. Sometimes no occupation is included, therefore the output from this function need further cleaning.
     """
 
     # replace all new lines with spaces
@@ -38,18 +37,24 @@ def extract_potential_occupations(txt):
     # replace more than one space with one space
     txt = re.sub(r"\s+", " ", txt)
 
-    # find all phone numbers
-    phone_numbers = re.findall(r"\d{2} \d{2} \d{2} \d{2}", txt)
-    
+    if year >= 1990:
+        # find all phone numbers
+        search_pattern = r"\d{2} \d{2} \d{2} \d{2}"
 
-    # find all the potential occupations
+    if year == 1945:
+        # look for each of these characters $, &, £, can be followed by space or Da
+        search_pattern = r"[$&£](?: |Da)"
+
+    # get the indexes of the matches
+    matches = re.finditer(search_pattern, txt)
+    
     potential_occupations = []
 
-    for phone_number in phone_numbers:
-        split_phone_number = txt.split(phone_number)[0] # keeping what is before the phone number 
+    for match in matches:
+        split_txt = txt[:match.start()]
 
         # split on space
-        potential_occupation = split_phone_number.split(" ")
+        potential_occupation = split_txt.split(" ")
         
         # get the last element if it is not empty else get the second last element
         if potential_occupation[-1] == "":
@@ -80,34 +85,35 @@ def clean_occupation_list(occupations, remove_list = []):
     
 
 
-
-
 if __name__ in "__main__":
     path = Path(__file__).parent
 
     # load in the extracted text files from vejvisere
     txt_path = path / "extracted_text"
 
-    txts = load_concat_txt(txt_path)
+    txts, years = load_txt(txt_path)
 
-
-    potential_occupations = extract_potential_occupations(txts)
+    occupations = []
+    
+    for txt, year in zip(txts, years):
+        potential_occupations = extract_potential_occupations(txt, int(year))
+        occupations.extend(potential_occupations)
 
     # remove duplicates
-    potential_occupations = list(set(potential_occupations))
+    occupations = list(set(occupations))
 
     # load in csv of names
     names_path = path / "misc" / "name_gender.csv"
     names = pd.read_csv(names_path)["Name"].to_list()
 
-    potential_occupations = clean_occupation_list(potential_occupations, names)
+    occupations = clean_occupation_list(occupations, names)
 
 
-    print(f"Number of potential occupations: {len(potential_occupations)}")
-    print(potential_occupations)
+    print(f"Number of potential occupations: {len(occupations)}")
+    print(occupations)
 
 
     # save the potential occupations to a csv file
     occupations_path = path / "occupation_list.csv"
 
-    pd.DataFrame(potential_occupations, columns=["occupation"]).to_csv(occupations_path, index=False)
+    pd.DataFrame(occupations, columns=["occupation"]).to_csv(occupations_path, index=False)
