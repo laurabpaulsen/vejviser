@@ -33,7 +33,7 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 **How do we move on from here?**
 * The strategy of looking at the word before the phone number or $, & and £ to capture occupations does not work for all the data. As the structure varies a lot, it will pretty much take individual search patterns for each year to try and get all the occupations. As seen we still end up catching a lot of non-occupations, and the list would require manual cleaning before we use it as a look up. 
 
-* We need to know at what page in the pdf (not the number at the bottom of the page, but the pdf page number) the actual gade-register starts. We also need to know where it ends. 
+* We need to know at what page in the pdf (not the number at the bottom of the page, but the pdf page number) the actual gade-register starts. We also need to know where it ends. See `file_info.py` and `file_info.txt`
 
 * When trying to extract texts from older registers, we are experiencing issues with the quality
 
