@@ -12,9 +12,9 @@ if __name__ in "__main__":
     # dictionary of file names and their start and stop pages
     file_info = {
         # 'file_name': [start_page, stop_page]
+        "kraks vejviser 1990 gaderegister A-K.pdf": [62, 918],
+        "kraks vejviser 1990 gaderegister L-Å.pdf": [2, 933],
         'Kraks Vejviser 1945 gaderegister .pdf': [27, None],
-        'Kraks Vejviser 1944 gaderegister.pdf': [27, 762],
-        "Kraks Vejviser 1943 Gade og hus register.pdf": [27, 739]
     }
 
     # save the dictionary to a file
