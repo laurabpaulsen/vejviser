@@ -85,7 +85,7 @@ if __name__ in "__main__":
         txt_counter += 1
         print(f"[INFO]: Processing text {txt_counter} of {n_txts}")
 
-        with open(txt_in, "r", encoding='latin-1') as file:
+        with open(txt_in, "r", encoding='UTF-8') as file:
             txt = file.read()
         
         splitted = re.split(' |\n', txt)
