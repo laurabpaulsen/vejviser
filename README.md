@@ -24,7 +24,7 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 
 * For the data from 1945 it is more complicated as there is a "funny" character (that I have no clue what is) just after the occupation. When we are extracting the text, this character is interpreted as many different characters ($, &, £, etc)
 
-* To try and clean it up as best as we can, we are taking a list of danish names, and if the "occupation" is in that list we remove it. Furthermore we remove any "occupations" that are just containing numbers
+* To try and clean it up as best as we can, we are taking a list of danish names (both first and last) as well as a list of stopwords, and if the "occupation" is in that list we remove it. Furthermore we remove any "occupations" that are just containing numbers
 
 * We then use this list as a "look up" in the Gaderegister, and count the number of times each occupation is mentioned in the text related to each street. 
 
@@ -41,6 +41,13 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 
 
 * The way we determine when we have reached a new street seems to work well for several years. However, this should be thoroughly tested. 
+
+**Results of running the proof-of-concept**
+We are able to extract occupations from the pdfs. However, we are also extracting non-occupations, and we cannot be sure, that we are counting all occurence of a given occupation. This is due to the quality of the extracted text and different spellings. 
+
+
+
+
 
 **Suggestion to check accuracy of our approach**
 * Manually create a a count of occupations in some select pages (preferably done for a range of years)
