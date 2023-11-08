@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 import pandas as pd
+from tqdm import tqdm
 
 def load_txt(path):
     """
@@ -37,7 +38,7 @@ def extract_potential_occupations(txt:str, year:int):
     # replace more than one space with one space
     txt = re.sub(r"\s+", " ", txt)
 
-    if year >= 1990:
+    if year == 1990:
         # find all phone numbers
         search_pattern = r"\d{2} \d{2} \d{2} \d{2}"
 
@@ -50,7 +51,7 @@ def extract_potential_occupations(txt:str, year:int):
     
     potential_occupations = []
 
-    for match in matches:
+    for match in tqdm(matches, desc = "match number:"):
         split_txt = txt[:match.start()]
 
         # split on space
@@ -95,7 +96,7 @@ if __name__ in "__main__":
 
     occupations = []
     
-    for txt, year in zip(txts, years):
+    for txt, year in tqdm(zip(txts, years), desc = "Extracting occupations from file:"):
         potential_occupations = extract_potential_occupations(txt, int(year))
         occupations.extend(potential_occupations)
 
