@@ -42,6 +42,11 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 
 * The way we determine when we have reached a new street seems to work well for several years. However, this should be thoroughly tested. 
 
+**Suggestion to check accuracy of our approach**
+* Manually create a a count of occupations in some select pages (preferably done for a range of years)
+* Compare that to the result of running our pipeline
+* Investigate where it fails (e.g., extracting text with OCR, the list of occupations we are searching for, when we are using the list to count the number of each occupation in a given street)
+
 
 
 ## Repository structure

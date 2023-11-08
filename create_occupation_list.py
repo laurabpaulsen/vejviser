@@ -39,6 +39,7 @@ def process_match(text):
     
     return potential_occupation
 
+
 def extract_potential_occupations(txt, year, num_processes=1):
     # Replace all new lines with spaces
     txt = txt.replace("\n", " ")
@@ -63,21 +64,16 @@ def extract_potential_occupations(txt, year, num_processes=1):
     
     potential_occupations = [process_match(part) for part in parts]
 
-    return sorted(potential_occupations)
+    return potential_occupations
 
 
-def clean_occupation_list(occupations, remove_list = []):
+def clean_occupation_list(occupations, create_occupation_list = True, remove_list = []):
     """
     Removes duplicates and occupations that are in the names list
     """
-
-    occupations = list(set(occupations))
-
-    remove_list_lower = [remove.lower() for remove in remove_list]
-
     # remove if in remove list
-    occupations = [occupation for occupation in occupations if occupation.lower() not in remove_list_lower]
-
+    occupations = [occupation for occupation in occupations if occupation.lower() not in remove_list]
+    
     # remove if there is a number in it
     occupations =  [occupation for occupation in occupations if not any(char.isdigit() for char in occupation)]
 
@@ -85,15 +81,29 @@ def clean_occupation_list(occupations, remove_list = []):
     occupations = [occupation for occupation in occupations if len(occupation) > 3]
 
     # replace commas in with nothing 
-    occupations = [occupation.replace(",", "") for occupation in occupations]
+    occupations = [occupation.replace(",", ".") for occupation in occupations]
 
     # remove if special characters is present (except for . and -)
     occupations = [occupation for occupation in occupations if not re.search(r'[^a-zA-Z0-9.-]', occupation)]
     
+    # A few street names were captured as well
     occupations = [occupation for occupation in occupations if not occupation.isupper()]
 
+    ### NOTE: CHECK THAT THE FOLLOWING ARE NOT PROBLEMS FOR COUNT_OCCUPATIONS ###
+    # remove spaces
+    occupations = [occupation.replace(" ", "") for occupation in occupations]
 
-    return occupations
+    # remove . if they are at the end!
+    occupations = [occupation.rstrip('.') for occupation in occupations]
+    
+    # lower case
+    occupations = [occupation.lower() for occupation in occupations]
+
+    if create_occupation_list:
+        occupations = list(set(occupations))
+
+
+    return sorted(occupations)
 
 
 
@@ -105,6 +115,15 @@ if __name__ in "__main__":
 
     txts, years = load_txt(txt_path)
 
+    # load in csv of names
+    names_path = path / "misc" / "name_gender.csv"
+    names = pd.read_csv(names_path)["Name"].to_list()
+
+    # read in txt file with last names
+    last_names_path = path / "misc" / "Efternavne - alle.txt"
+    last_names = open(last_names_path, "r", encoding="UTF-8").read().split("\n")
+
+    remove_list = [name.lower() for name in names + last_names]
     occupations = []
     
     for i, (txt, year) in enumerate(zip(txts, years)):
@@ -112,15 +131,8 @@ if __name__ in "__main__":
         potential_occupations = extract_potential_occupations(txt, int(year), cpu_count()-1)
         occupations.extend(potential_occupations)
 
-    # load in csv of names
-    names_path = path / "misc" / "name_gender.csv"
-    names = pd.read_csv(names_path)["Name"].to_list()
 
-    last_name_path = path / "misc" / "efternavne.csv"
-    last_names = pd.read_csv(last_name_path)["Navn"].to_list()
-
-
-    occupations = clean_occupation_list(occupations, names + last_names)
+    occupations = clean_occupation_list(occupations, remove_list)
 
     print(f"Number of potential occupations: {len(occupations)}")
 

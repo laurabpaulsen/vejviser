@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import re
 from collections import Counter
+from create_occupation_list import clean_occupation_list
 
 def list_txts_dir(path: Path):
     """
@@ -104,6 +105,9 @@ if __name__ in "__main__":
 
         for i, text in enumerate(dictionary['text']):
 
+            # preprocess text HERE so it matches what is done in create_occupation list
+            text_cleaned = clean_occupation_list(text, create_occupation_list=False, remove_list=[])
+
             # extract occupations
             occupations = [token for token in text if token in occupation_list]
         
@@ -120,13 +124,17 @@ if __name__ in "__main__":
 
             data = pd.concat([data, df], ignore_index=True, axis=0)
 
+    
+
     # create ndjson
     data_json = data.to_json(orient='records', lines=True)
 
     out_path = path / "out" 
+    data.to_csv(path / "out" / "street_occupations.csv")
     
     if not out_path.exists():
         out_path.mkdir()
     
-    with open(out_path / "street_occupations.ndjson", "w", encoding="latin-1") as file:
+    with open(out_path / "street_occupations.ndjson", "w", encoding="UTF-8") as file:
         file.write(data_json)
+
