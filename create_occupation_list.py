@@ -28,9 +28,8 @@ def load_txt(path):
     return txt_files, years
 
     
-def process_match(start):
-    split_txt = txt[:start]
-    potential_occupation = split_txt.split(" ")
+def process_match(text):
+    potential_occupation = text.split(" ")
     
     if potential_occupation[-1] == "":
         potential_occupation = potential_occupation[-2]
@@ -55,21 +54,16 @@ def extract_potential_occupations(txt, year, num_processes=1):
         # Look for each of these characters $, &, £, can be followed by space or Da
         search_pattern = r"[$&£](?: |Da)"
 
-    # Get the indexes of the matches
-    matches = re.finditer(search_pattern, txt)
-    matches = tuple(matches)
 
     # Find all match start positions
     match_positions = [match.start() for match in re.finditer(search_pattern, txt)]
 
-
-
-    # Use multiprocessing to process matches in parallel
-    with Pool(num_processes) as pool:
-        potential_occupations = list(tqdm(pool.imap(process_match, match_positions), total=len(match_positions), desc="Processing matches"))
+    # create a list split on all the match start positions
+    parts = [txt[i:j] for i,j in zip(match_positions, match_positions[1:]+[None])]
+    
+    potential_occupations = [process_match(part) for part in parts]
 
     return potential_occupations
-
 
 
 def clean_occupation_list(occupations, remove_list = []):
@@ -109,7 +103,6 @@ if __name__ in "__main__":
     names = pd.read_csv(names_path)["Name"].to_list()
 
     occupations = clean_occupation_list(occupations, names)
-
 
     print(f"Number of potential occupations: {len(occupations)}")
     print(occupations)
