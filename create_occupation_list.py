@@ -2,6 +2,8 @@ from pathlib import Path
 import re
 import pandas as pd
 from tqdm import tqdm
+import re
+from multiprocessing import Pool, cpu_count
 
 def load_txt(path):
     """
@@ -25,47 +27,50 @@ def load_txt(path):
 
     return txt_files, years
 
+    
+def process_match(start):
+    split_txt = txt[:start]
+    potential_occupation = split_txt.split(" ")
+    
+    if potential_occupation[-1] == "":
+        potential_occupation = potential_occupation[-2]
+    
+    else:
+        potential_occupation = potential_occupation[-1]
+    
+    return potential_occupation
 
-
-def extract_potential_occupations(txt:str, year:int):
-    """
-    Extracts the potential occupations.
-    """
-
-    # replace all new lines with spaces
+def extract_potential_occupations(txt, year, num_processes=1):
+    # Replace all new lines with spaces
     txt = txt.replace("\n", " ")
 
-    # replace more than one space with one space
+    # Replace more than one space with one space
     txt = re.sub(r"\s+", " ", txt)
 
     if year == 1990:
-        # find all phone numbers
+        # Find all phone numbers
         search_pattern = r"\d{2} \d{2} \d{2} \d{2}"
 
     if year == 1945:
-        # look for each of these characters $, &, £, can be followed by space or Da
+        # Look for each of these characters $, &, £, can be followed by space or Da
         search_pattern = r"[$&£](?: |Da)"
 
-    # get the indexes of the matches
+    # Get the indexes of the matches
     matches = re.finditer(search_pattern, txt)
-    
-    potential_occupations = []
+    matches = tuple(matches)
 
-    for match in tqdm(matches, desc = "match number:"):
-        split_txt = txt[:match.start()]
+    # Find all match start positions
+    match_positions = [match.start() for match in re.finditer(search_pattern, txt)]
 
-        # split on space
-        potential_occupation = split_txt.split(" ")
-        
-        # get the last element if it is not empty else get the second last element
-        if potential_occupation[-1] == "":
-            potential_occupation = potential_occupation[-2]
-        else:
-            potential_occupation = potential_occupation[-1]
 
-        potential_occupations.append(potential_occupation)
+
+    # Use multiprocessing to process matches in parallel
+    with Pool(num_processes) as pool:
+        potential_occupations = list(tqdm(pool.imap(process_match, match_positions), total=len(match_positions), desc="Processing matches"))
 
     return potential_occupations
+
+
 
 def clean_occupation_list(occupations, remove_list = []):
     """
@@ -83,8 +88,6 @@ def clean_occupation_list(occupations, remove_list = []):
     return occupations
 
 
-    
-
 
 if __name__ in "__main__":
     path = Path(__file__).parent
@@ -96,12 +99,10 @@ if __name__ in "__main__":
 
     occupations = []
     
-    for txt, year in tqdm(zip(txts, years), desc = "Extracting occupations from file:"):
-        potential_occupations = extract_potential_occupations(txt, int(year))
+    for i, (txt, year) in enumerate(zip(txts, years)):
+        print(f"Extracting occupations from file number {i+1}")
+        potential_occupations = extract_potential_occupations(txt, int(year), cpu_count()-1)
         occupations.extend(potential_occupations)
-
-    # remove duplicates
-    occupations = list(set(occupations))
 
     # load in csv of names
     names_path = path / "misc" / "name_gender.csv"
@@ -112,7 +113,6 @@ if __name__ in "__main__":
 
     print(f"Number of potential occupations: {len(occupations)}")
     print(occupations)
-
 
     # save the potential occupations to a csv file
     occupations_path = path / "occupation_list.csv"
