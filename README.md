@@ -28,29 +28,30 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 
 * We then use this list as a "look up" in the Gaderegister, and count the number of times each occupation is mentioned in the text related to each street. 
 
+**Results of running the proof-of-concept**
 
+We are able to extract occupations from the pdfs. In total, our script has extracted 31726 unique tokens of which many are not actual occupations. Below, we show the counts of the 30 most common occupations across the entire city for one year. Evidently, we have problems with non-occupations being included in our occupation list, e.g., "eee" and "alfabetiseringsregler". 
 
-**How do we move on from here?**
-* The strategy of looking at the word before the phone number or $, & and £ to capture occupations does not work for all the data. As the structure varies a lot, it will pretty much take individual search patterns for each year to try and get all the occupations. As seen we still end up catching a lot of non-occupations, and the list would require manual cleaning before we use it as a look up. 
+![](out/plot.png)
 
-* We need to know at what page in the pdf (not the number at the bottom of the page, but the pdf page number) the actual gade-register starts. We also need to know where it ends. See `file_info.py` and `file_info.txt`
+**Future steps**
+* The strategy of looking at the word before the phone number or $, & and £ to capture occupations does not work for all the data. As the structure varies a lot, it will pretty much take individual search patterns for each year to try and get all the occupations. 
 
-* When trying to extract texts from older registers, we are experiencing issues with the quality
+* Even with year-specific extraction rules/patterns, we still end up catching a lot of non-occupations, and the list will require manual cleaning before we use it as a look up. 
+
+* We need to know at what page in the pdf (not the number at the bottom of the page, but the pdf page number) the actual gade-register starts. We also need to know where it ends. See `file_info.py` and `file_info.txt`.
+
+* When trying to extract texts from older registers, we are experiencing issues with the quality.
+
+* We most likely do not catch all occupations in the pdfs. This can be due to several things: The quality of the extracted text (e.g., if "bager" is extracted as "bag er" or the tokens to be matched with the year-specific pattern are not extracted correctly with OCR), if an occupation is also a name, if the year-specific pattern does not match all intended cases.
 
 * Some occupations might be captured by different spellings. To merge these we would need to make some kind of mapping. 
 
-
 * The way we determine when we have reached a new street seems to work well for several years. However, this should be thoroughly tested. 
-
-**Results of running the proof-of-concept**
-We are able to extract occupations from the pdfs. However, we are also extracting non-occupations, and we cannot be sure, that we are counting all occurence of a given occupation. This is due to the quality of the extracted text and different spellings. 
-
-
-
 
 
 **Suggestion to check accuracy of our approach**
-* Manually create a a count of occupations in some select pages (preferably done for a range of years)
+* Manually create a count of occupations in some select pages (preferably done for a range of years)
 * Compare that to the result of running our pipeline
 * Investigate where it fails (e.g., extracting text with OCR, the list of occupations we are searching for, when we are using the list to count the number of each occupation in a given street)
 
