@@ -105,7 +105,7 @@ if __name__ in "__main__":
 
         for i, text in enumerate(dictionary['text']):
 
-            # preprocess text HERE so it matches what is done in create_occupation list
+            # preprocess text so it matches what is done in create_occupation list
             text_cleaned = clean_occupation_list(text, create_occupation_list=False, remove_list=[])
 
             # extract occupations
@@ -116,7 +116,7 @@ if __name__ in "__main__":
 
             # organize in df
             df = pd.DataFrame({
-                "year": [Path(txt_in).stem] * len(occupations_count),
+                "year": [re.findall(r"\d{4}", str(txt_in))[0]] * len(occupations_count),
                 "street": [dictionary['street'][i]] * len(occupations_count),
                 "occupations": [item[0] for item in occupations_count.items()],
                 "count":       [item[1] for item in occupations_count.items()]
@@ -130,7 +130,7 @@ if __name__ in "__main__":
     data_json = data.to_json(orient='records', lines=True)
 
     out_path = path / "out" 
-    data.to_csv(path / "out" / "street_occupations.csv")
+    data.to_csv(path / "out" / "street_occupations.csv", index = False)
     
     if not out_path.exists():
         out_path.mkdir()

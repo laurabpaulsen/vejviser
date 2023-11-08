@@ -160,7 +160,8 @@ cython_debug/
 #.idea/
 *.csv
 *.pdf
+*.ndjson
 
 pdfs/*
 extracted_text/*
-out/*
+misc/*

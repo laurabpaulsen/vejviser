@@ -29,7 +29,7 @@ def load_txt(path):
 
     
 def process_match(text):
-    potential_occupation = text.split(" ")
+    potential_occupation = re.split(' |\n', text)
     
     if potential_occupation[-1] == "":
         potential_occupation = potential_occupation[-2]
@@ -40,16 +40,16 @@ def process_match(text):
     return potential_occupation
 
 
-def extract_potential_occupations(txt, year, num_processes=1):
+def extract_potential_occupations(txt, year):
     # Replace all new lines with spaces
-    txt = txt.replace("\n", " ")
+    #txt = txt.replace("\n", " ")
 
     # Replace more than one space with one space
     txt = re.sub(r"\s+", " ", txt)
 
     if year == 1990:
         # Find all phone numbers
-        search_pattern = r"\d{2} \d{2} \d{2} \d{2}"
+        search_pattern = r" \d{2} ?\d{2} ?\d{2} ?\d{2}"
 
     if year == 1945:
         # Look for each of these characters $, &, £, can be followed by space or Da
@@ -71,14 +71,17 @@ def clean_occupation_list(occupations, create_occupation_list = True, remove_lis
     """
     Removes duplicates and occupations that are in the names list
     """
+    # A few street names were captured as well
+    occupations = [occupation for occupation in occupations if not occupation.isupper()]
+
+    # lower case
+    occupations = [occupation.lower() for occupation in occupations]
+    
     # remove if in remove list
-    occupations = [occupation for occupation in occupations if occupation.lower() not in remove_list]
+    occupations = [occupation for occupation in occupations if occupation not in remove_list]
     
     # remove if there is a number in it
     occupations =  [occupation for occupation in occupations if not any(char.isdigit() for char in occupation)]
-
-    # remove if length is three or shorter
-    occupations = [occupation for occupation in occupations if len(occupation) > 3]
 
     # replace commas in with nothing 
     occupations = [occupation.replace(",", ".") for occupation in occupations]
@@ -86,18 +89,16 @@ def clean_occupation_list(occupations, create_occupation_list = True, remove_lis
     # remove if special characters is present (except for . and -)
     occupations = [occupation for occupation in occupations if not re.search(r'[^a-zA-Z0-9.-]', occupation)]
     
-    # A few street names were captured as well
-    occupations = [occupation for occupation in occupations if not occupation.isupper()]
-
     ### NOTE: CHECK THAT THE FOLLOWING ARE NOT PROBLEMS FOR COUNT_OCCUPATIONS ###
     # remove spaces
     occupations = [occupation.replace(" ", "") for occupation in occupations]
 
     # remove . if they are at the end!
-    occupations = [occupation.rstrip('.') for occupation in occupations]
+    #occupations = [occupation.rstrip('.') for occupation in occupations]
+
+    # remove if length is two or shorter
+    occupations = [occupation for occupation in occupations if len(occupation) > 2]
     
-    # lower case
-    occupations = [occupation.lower() for occupation in occupations]
 
     if create_occupation_list:
         occupations = list(set(occupations))
@@ -123,16 +124,23 @@ if __name__ in "__main__":
     last_names_path = path / "misc" / "Efternavne - alle.txt"
     last_names = open(last_names_path, "r", encoding="UTF-8").read().split("\n")
 
-    remove_list = [name.lower() for name in names + last_names]
+    # read in txt file with danish stop words
+    stop_word_path = path / "misc" / "stopord.txt"
+    stop_words = open(stop_word_path, "r", encoding="UTF-8").read().split("\n")
+    
+    remove_list = names + last_names + stop_words + ["side"]
+
+    remove_list = [name.lower() for name in remove_list]
+    
     occupations = []
     
     for i, (txt, year) in enumerate(zip(txts, years)):
         print(f"Extracting occupations from file number {i+1}")
-        potential_occupations = extract_potential_occupations(txt, int(year), cpu_count()-1)
+        potential_occupations = extract_potential_occupations(txt, int(year))
         occupations.extend(potential_occupations)
 
 
-    occupations = clean_occupation_list(occupations, remove_list)
+    occupations = clean_occupation_list(occupations, remove_list = remove_list)
 
     print(f"Number of potential occupations: {len(occupations)}")
 
