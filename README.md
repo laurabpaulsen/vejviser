@@ -30,7 +30,7 @@ count_occupations.py # draft, check with Peter that the output format is as expe
 
 **Results of running the proof-of-concept**
 
-We are able to extract occupations from the pdfs. In total, our script has extracted 31726 unique tokens of which many are not actual occupations. Below, we show the counts of the 30 most common occupations across the entire city for one year. Evidently, we have problems with non-occupations being included in our occupation list, e.g., "eee" and "alfabetiseringsregler". 
+We are able to extract occupations from the pdfs. In total, our script has extracted 31726 unique tokens of which many are not actual occupations. Below, we show the relative frequency of the 30 most common occupations across the entire city for one year. Evidently, we have problems with non-occupations being included in our occupation list, e.g., "eee" and "alfabetiseringsregler". 
 
 ![](out/plot.png)
 
