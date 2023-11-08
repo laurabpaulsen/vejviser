@@ -164,3 +164,4 @@ cython_debug/
 pdfs/*
 extracted_text/*
 out/*
+misc/*
