@@ -63,7 +63,7 @@ def extract_potential_occupations(txt, year, num_processes=1):
     
     potential_occupations = [process_match(part) for part in parts]
 
-    return potential_occupations
+    return sorted(potential_occupations)
 
 
 def clean_occupation_list(occupations, remove_list = []):
@@ -73,11 +73,25 @@ def clean_occupation_list(occupations, remove_list = []):
 
     occupations = list(set(occupations))
 
-    # remove if in remove list
-    occupations = [occupation for occupation in occupations if occupation not in remove_list]
+    remove_list_lower = [remove.lower() for remove in remove_list]
 
-    # remove if it is a number
-    occupations = [occupation for occupation in occupations if not occupation.isnumeric()]
+    # remove if in remove list
+    occupations = [occupation for occupation in occupations if occupation.lower() not in remove_list_lower]
+
+    # remove if there is a number in it
+    occupations =  [occupation for occupation in occupations if not any(char.isdigit() for char in occupation)]
+
+    # remove if length is three or shorter
+    occupations = [occupation for occupation in occupations if len(occupation) > 3]
+
+    # replace commas in with nothing 
+    occupations = [occupation.replace(",", "") for occupation in occupations]
+
+    # remove if special characters is present (except for . and -)
+    occupations = [occupation for occupation in occupations if not re.search(r'[^a-zA-Z0-9.-]', occupation)]
+    
+    occupations = [occupation for occupation in occupations if not occupation.isupper()]
+
 
     return occupations
 
@@ -102,10 +116,13 @@ if __name__ in "__main__":
     names_path = path / "misc" / "name_gender.csv"
     names = pd.read_csv(names_path)["Name"].to_list()
 
-    occupations = clean_occupation_list(occupations, names)
+    last_name_path = path / "misc" / "efternavne.csv"
+    last_names = pd.read_csv(last_name_path)["Navn"].to_list()
+
+
+    occupations = clean_occupation_list(occupations, names + last_names)
 
     print(f"Number of potential occupations: {len(occupations)}")
-    print(occupations)
 
     # save the potential occupations to a csv file
     occupations_path = path / "occupation_list.csv"
