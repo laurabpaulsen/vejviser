@@ -21,13 +21,13 @@ if __name__ in "__main__":
         file_info = json.load(f)
 
 
-    for pdf, info in tqdm(file_info, desc = "Extracting text from pdf"):
+    for pdf, info in tqdm(file_info.items(), desc = "Extracting text from pdf"):
         # get the start and stop page numbers for the file
         start_page = info[0]
         stop_page = info[1]
 
         # check if the file has already been processed
-        if (out_path / f"{pdf.stem}.txt").exists():
+        if (out_path / f"{pdf[:-4]}.txt").exists():
             continue
         
         # convert pdf to image
@@ -41,5 +41,5 @@ if __name__ in "__main__":
             
             txt_all = " ".join([txt_all, txt])
 
-        with open(out_path / f"{pdf.stem}.txt", "w", encoding="UTF-8") as text_file:
+        with open(out_path / f"{pdf[:-4]}.txt", "w", encoding="UTF-8") as text_file:
                 text_file.write(txt_all)
