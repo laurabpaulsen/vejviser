@@ -6,26 +6,6 @@ from pathlib import Path
 from tqdm import tqdm
 import json
 
-def list_pdfs_dir(path: Path):
-    """
-    Lists all the pdfs in a given path.
-    
-    Parameters
-    ----------
-    path : Path
-        Path to the folder containing the pdfs.
-    
-    Returns
-    -------
-    pdfs : list
-        List of all the pdfs in the given path.
-    """
-    pdfs = []
-    for pdf in path.glob('**/*.pdf'):
-        pdfs.append(pdf)
-    
-    return pdfs
-
 
 if __name__ in "__main__":
     path = Path(__file__).parent
@@ -40,17 +20,18 @@ if __name__ in "__main__":
     with open(path / 'file_info.txt', 'r') as f:
         file_info = json.load(f)
 
-    # get all pdfs in the folder
-    pdfs = list_pdfs_dir(pdfs_path)
 
-    for pdf in tqdm(pdfs, desc = "Extracting text from pdf"):
-
+    for pdf, info in tqdm(file_info, desc = "Extracting text from pdf"):
         # get the start and stop page numbers for the file
-        start_page = file_info[pdf.name][0]
-        stop_page = file_info[pdf.name][1]
+        start_page = info[0]
+        stop_page = info[1]
+
+        # check if the file has already been processed
+        if (out_path / f"{pdf.stem}.txt").exists():
+            continue
         
         # convert pdf to image
-        doc = convert_from_path(pdf, first_page=start_page, last_page=stop_page)
+        doc = convert_from_path(pdfs_path / pdf, first_page=start_page, last_page=stop_page)
 
         txt_all = ""
 
