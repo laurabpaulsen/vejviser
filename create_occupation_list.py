@@ -156,4 +156,4 @@ if __name__ in "__main__":
 
         print(f"Number of potential occupations ({year}): {len(occupations)}")
 
-        pd.DataFrame(occupations, columns=["occupation"]).to_csv(occupations_path / "occupation_list_{year}", index=False)
+        pd.DataFrame(occupations, columns=["occupation"]).to_csv(occupations_path / f"occupation_list_{year}.csv", index=False)

@@ -71,11 +71,11 @@ if __name__ in "__main__":
     # read occupation list
     occupations_path = path / "occupation_lists"
 
-    for i, occupation_list in enumerate(occupations_path.glob("*.csv")):
+    for i, occupations in enumerate(occupations_path.glob("*.csv")):
         if i == 0:
-            occupation_list = pd.read_csv(occupation_list)
+            occupation_list = pd.read_csv(occupations)
         else:
-            occupation_list = pd.concat([occupation_list, pd.read_csv(occupation_list)], ignore_index=True, axis=0)
+            occupation_list = pd.concat([occupation_list, pd.read_csv(occupations)], ignore_index=True, axis=0)
     
 
     occupation_list = list(occupation_list['occupation'] )
