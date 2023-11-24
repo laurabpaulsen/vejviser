@@ -47,6 +47,17 @@ def extract_potential_occupations(txt, year):
     # Replace more than one space with one space
     txt = re.sub(r"\s+", " ", txt)
 
+
+    
+    if year == 1880:
+        pass
+
+    if year == 1900:
+        pass
+
+    if year == 1930:
+        pass
+
     if year == 1990:
         # Find all phone numbers
         search_pattern = r" \d{2} ?\d{2} ?\d{2} ?\d{2}"
@@ -54,7 +65,6 @@ def extract_potential_occupations(txt, year):
     if year == 1945:
         # Look for each of these characters $, &, £, can be followed by space or Da
         search_pattern = r"[$&£](?: |Da)"
-
 
     # Find all match start positions
     match_positions = [match.start() for match in re.finditer(search_pattern, txt)]
