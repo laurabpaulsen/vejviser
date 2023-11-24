@@ -47,32 +47,32 @@ def extract_potential_occupations(txt, year):
     # Replace more than one space with one space
     txt = re.sub(r"\s+", " ", txt)
 
-
-    
-    if year == 1880:
-        pass
-
-    if year == 1900:
-        pass
-
-    if year == 1930:
-        pass
+    if year in [1880, 1900, 1930]:
+        # get what is between a capital letter and a space followed by a number
+        search_pattern = r"\b[A-Z][^A-Z0-9]+(\S+)\s\d+"
+        split_process = False
 
     if year == 1990:
         # Find all phone numbers
         search_pattern = r" \d{2} ?\d{2} ?\d{2} ?\d{2}"
+        split_process = True
 
     if year == 1945:
         # Look for each of these characters $, &, £, can be followed by space or Da
         search_pattern = r"[$&£](?: |Da)"
+        split_process = True
 
-    # Find all match start positions
-    match_positions = [match.start() for match in re.finditer(search_pattern, txt)]
+    if split_process:
+        # Find all match start positions
+        match_positions = [match.start() for match in re.finditer(search_pattern, txt)]
 
-    # create a list split on all the match start positions
-    parts = [txt[i:j] for i,j in zip(match_positions, match_positions[1:]+[None])]
-    
-    potential_occupations = [process_match(part) for part in parts]
+        # create a list split on all the match start positions
+        parts = [txt[i:j] for i,j in zip(match_positions, match_positions[1:]+[None])]
+        potential_occupations = [process_match(part) for part in parts]
+        
+    else:
+        potential_occupations = re.findall(search_pattern, txt)
+        potential_occupations = [occupation.strip() for occupation in potential_occupations]
 
     return potential_occupations
 
@@ -142,19 +142,18 @@ if __name__ in "__main__":
 
     remove_list = [name.lower() for name in remove_list]
     
-    occupations = []
+    # save the potential occupations to a csv file
+    occupations_path = path / "occupation_lists"
+
+    # make sure the directory exists
+    if not occupations_path.exists():
+        occupations_path.mkdir(parents=True)
     
     for i, (txt, year) in enumerate(zip(txts, years)):
         print(f"Extracting occupations from file number {i+1}")
         potential_occupations = extract_potential_occupations(txt, int(year))
-        occupations.extend(potential_occupations)
+        occupations = clean_occupation_list(potential_occupations, remove_list = remove_list)
 
+        print(f"Number of potential occupations ({year}): {len(occupations)}")
 
-    occupations = clean_occupation_list(occupations, remove_list = remove_list)
-
-    print(f"Number of potential occupations: {len(occupations)}")
-
-    # save the potential occupations to a csv file
-    occupations_path = path / "occupation_list.csv"
-
-    pd.DataFrame(occupations, columns=["occupation"]).to_csv(occupations_path, index=False)
+        pd.DataFrame(occupations, columns=["occupation"]).to_csv(occupations_path / "occupation_list_{year}", index=False)

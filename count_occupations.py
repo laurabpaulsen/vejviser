@@ -66,12 +66,22 @@ if __name__ in "__main__":
     
     path = Path(__file__).parent
 
-    txts_path = path / "extracted_text" 
+    txts_path = path / "extracted_text"
 
-    occupation_list = pd.read_csv( path / "occupation_list.csv")
+    # read occupation list
+    occupations_path = path / "occupation_lists"
 
-    # DELETE OR EDIT ONCE TRUE OCCUPATION_LIST IS AVAILABLE
+    for i, occupation_list in enumerate(occupations_path.glob("*.csv")):
+        if i == 0:
+            occupation_list = pd.read_csv(occupation_list)
+        else:
+            occupation_list = pd.concat([occupation_list, pd.read_csv(occupation_list)], ignore_index=True, axis=0)
+    
+
     occupation_list = list(occupation_list['occupation'] )
+    
+    # remove dubplicates
+    occupation_list = list(set(occupation_list))
 
     # create master data frame
     data = pd.DataFrame(columns = ['year', 'street', 'occupations', 'count'])
