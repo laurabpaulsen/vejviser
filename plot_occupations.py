@@ -26,13 +26,10 @@ def most_common_occupations_year(data, year, n=10, col = "n_freq", save_path = N
     """
     fig, ax = plt.subplots(figsize = (8, 6), dpi = 300)
 
-    # get data for given year
-    data_year = data[data["year"] == year]
-
     # get top n occupations
-    data_year = data_year.sort_values(by = col, ascending=False).head(n)
+    data = data.sort_values(by = col, ascending=False).head(n)
 
-    ax.barh(data_year.index.get_level_values("occupations"), data_year[col])
+    ax.barh(data.index.get_level_values("occupations"), data[col])
 
     ax.set_title(f"Top {n} occupations in {year}")
 
@@ -41,17 +38,18 @@ def most_common_occupations_year(data, year, n=10, col = "n_freq", save_path = N
     plt.tight_layout()
 
     if save_path:
-        data_year.to_csv(save_path / f"top_occupations_{year}.csv")
+        plt.savefig(save_path / f"top_occupations_{year}_{col}.png")
 
 
-if __name__ in "main":
+if __name__ in "__main__":
     path = Path(__file__).parent
 
     # path to save figures to
     save_path = path / "fig"
 
     # ensure path exists
-    save_path.mkdir(parents=True, exist_ok=True)
+    if not save_path.exists():
+        save_path.mkdir()
 
     # read in data
     data = pd.read_csv(path / "out" /"street_occupations.csv")
@@ -60,6 +58,12 @@ if __name__ in "main":
     data["year"] = data["year"].astype(int)
 
     for year in data["year"].unique():
-        most_common_occupations_year(data, year, n=10, col = "n_freq", save_path = save_path)
+        tmp_data = data[data["year"]==year]
+        tmp_data = data.groupby(["occupations", "year"]).sum(numeric_only = True).sort_values("count", ascending=False)
+        n_occupations = tmp_data.groupby("year").sum(numeric_only=True)["count"]
+        tmp_data["rel_freq"] = tmp_data["count"]/n_occupations.values[0]
+
+        most_common_occupations_year(tmp_data, year, n=30, col = "count", save_path = save_path)
+        most_common_occupations_year(tmp_data, year, n=30, col = "rel_freq", save_path = save_path)
 
 
